@@ -1,0 +1,5 @@
+https://api.waqi.info/feed/geo:-31.95;115.86/?token=b53c02d5418cabf71c695e492b8fd37104ec0150
+https://api.waqi.info/feed/geo:-33.8688;151.2093/?token=b53c02d5418cabf71c695e492b8fd37104ec0150
+https://api.waqi.info/feed/geo:-37.8136;144.9631/?token=b53c02d5418cabf71c695e492b8fd37104ec0150
+https://api.waqi.info/feed/geo:-27.4698;153.0251/?token=b53c02d5418cabf71c695e492b8fd37104ec0150
+https://api.waqi.info/feed/geo:-34.9285;138.6007/?token=b53c02d5418cabf71c695e492b8fd37104ec0150
