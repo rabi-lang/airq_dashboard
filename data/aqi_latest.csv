@@ -1,6 +1,6 @@
 city,aqi,observed_at_utc,lat,lon,station_name,dominentpol,pm25,pm10,o3,no2,so2,co,nh3,aqi_category,aqi_range
-Perth,3,2025-09-05 01:00:00+00:00,-31.8757651,115.9660496,Caversham,pm25,3,3,22.0,5.6,,,,Good,0-50
-Sydney,28,2025-09-05 02:00:00+00:00,-33.872468,151.213337,Cook And Phillip Sydney East,pm25,28,12,0.8,23.6,,4.5,,Good,0-50
-Melbourne,12,2025-09-05 03:00:00+00:00,-37.8073959,144.97,Melbourne CBD,pm25,12,11,8.0,3.8,0.8,1.5,,Good,0-50
-Brisbane,22,2025-09-05 03:00:00+00:00,-27.4774,153.0281,Brisbane CBD,pm25,22,12,,,,,,Good,0-50
-Adelaide,1,2025-09-04 20:00:00+00:00,-35.3778,140.5378,SA Murray Darling Basin Lameroo,pm10,4,1,,,,,,Good,0-50
+Perth,4,2025-09-08 20:00:00+00:00,-31.8757651,115.9660496,Caversham,pm10,3,4,18.0,8.9,,,,Good,0-50
+Sydney,34,2025-09-08 21:00:00+00:00,-33.872468,151.213337,Cook And Phillip Sydney East,pm25,34,16,2.3,25.4,,2.9,,Good,0-50
+Melbourne,11,2025-09-08 21:00:00+00:00,-37.8073959,144.97,Melbourne CBD,pm25,11,11,8.0,3.8,0.8,1.5,,Good,0-50
+Brisbane,17,2025-09-08 21:00:00+00:00,-27.4774,153.0281,Brisbane CBD,pm25,17,10,,,,,,Good,0-50
+Adelaide,4,2025-09-08 20:00:00+00:00,-35.3778,140.5378,SA Murray Darling Basin Lameroo,pm25,4,1,,,,,,Good,0-50

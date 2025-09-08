@@ -162,6 +162,110 @@ with tab2:
     else:
         st.info("No log yet—run the fetcher a few times to build history.")
 
+    # Pollutant Concentration by City
+    if not filtered.empty:
+        st.subheader("Pollutant Concentration by City")
+
+        # Melt dataframe to long format for Plotly
+        df_melted = filtered.melt(
+            id_vars=["city"],
+            value_vars=["pm25", "pm10", "o3", "no2", "so2", "co", "nh3"],
+            var_name="Pollutant",
+            value_name="Concentration"
+        )
+
+        # Remove missing concentrations
+        df_melted = df_melted.dropna(subset=["Concentration"])
+
+        if not df_melted.empty:
+            # Create grouped bar chart
+            fig_pollutants = px.bar(
+                df_melted,
+                x="city",
+                y="Concentration",
+                color="Pollutant",
+                barmode="group",  # Use 'stack' for stacked bar chart
+                title="Concentration of Pollutants by City",
+                color_discrete_sequence=px.colors.qualitative.Safe
+            )
+            fig_pollutants.update_layout(
+                xaxis_title="City",
+                yaxis_title="Concentration (µg/m³)",
+                legend_title="Pollutant"
+            )
+            st.plotly_chart(fig_pollutants, use_container_width=True)
+        else:
+            st.info("No pollutant concentration data available for selected cities.")
+    else:
+        st.warning("No data available to display pollutant concentrations.")
+
+    # Relationship Between AQI and Pollutants (Grouped by City)
+    if not filtered.empty:
+        st.subheader("Relationship Between AQI and Pollutants (Grouped by City)")
+
+        # Melt data for plotting
+        df_melted_aqi = filtered.melt(
+            id_vars=["city", "aqi"],
+            value_vars=["pm25", "pm10", "o3", "no2", "so2", "co", "nh3"],
+            var_name="Pollutant",
+            value_name="Concentration"
+        )
+
+        # Remove missing values
+        df_melted_aqi = df_melted_aqi.dropna(subset=["Concentration"])
+
+        # Scatter plot grouped by city
+        fig_scatter_city = px.scatter(
+            df_melted_aqi,
+            x="Concentration",
+            y="aqi",
+            color="Pollutant",
+            facet_col="city",  # Creates separate panels per city
+            hover_data=["city"],
+            title="AQI vs Pollutant Concentration by City",
+            color_discrete_sequence=px.colors.qualitative.Safe
+        )
+
+        fig_scatter_city.update_layout(
+            xaxis_title="Pollutant Concentration (µg/m³)",
+            yaxis_title="AQI",
+            legend_title="Pollutant"
+        )
+
+        st.plotly_chart(fig_scatter_city, use_container_width=True)
+    else:
+        st.warning("No data available to display relation")
+
+    # Which pollutants move with AQI?
+    if not filtered.empty:
+        st.subheader("Which pollutants move with AQI? (Correlation over log)")
+        poll_cols = [c for c in ["pm25","pm10","o3","no2","so2","co","nh3"] if c in df_log.columns]
+        corr_s = df_log[poll_cols + ["aqi"]].corr(method="spearman")["aqi"].drop("aqi").sort_values(ascending=False)
+        corr_df = corr_s.reset_index().rename(columns={"index":"Pollutant","aqi":"Spearman ρ"})
+
+        fig_corr_rank = px.bar(corr_df, x="Pollutant", y="Spearman ρ",
+                               title="Pollutant–AQI correlation (higher = stronger relationship)",
+                               color="Pollutant", color_discrete_sequence=px.colors.qualitative.Safe)
+        st.plotly_chart(fig_corr_rank, use_container_width=True)
+    else:
+        st.warning("No data available to display dominant pollutant")
+
+    # AQI vs pollutant concentration over time
+    if not filtered.empty:
+        st.subheader("AQI vs pollutant concentration over time (trendlines)")
+        long = df_log.melt(id_vars=["city","aqi","observed_at_awst"],
+                           value_vars=poll_cols, var_name="Pollutant", value_name="Concentration").dropna()
+        fig_scatter_trend = px.scatter(long, x="Concentration", y="aqi",
+                                       color="Pollutant", facet_col="Pollutant", facet_col_wrap=3,
+                                       trendline="ols",  # or "lowess" if you prefer
+                                       hover_data=["city","observed_at_awst"],
+                                       color_discrete_sequence=px.colors.qualitative.Safe,
+                                       title="AQI vs Pollutant (per pollutant panels, with trendlines)")
+        fig_scatter_trend.update_yaxes(matches=None)  # independent y for clarity
+        st.plotly_chart(fig_scatter_trend, use_container_width=True)
+    else:
+        st.warning("No data available to display dominant pollutant")
+
     # Correlation heatmap
     if not filtered.empty and all(p in filtered.columns for p in pollutants + ["aqi"]):
         st.subheader("Pollutant Correlations (Discovery)")
