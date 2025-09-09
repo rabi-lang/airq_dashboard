@@ -295,15 +295,114 @@ with tab2:
         st.dataframe(df_custom, use_container_width=True)
 
 with tab3:
-    # Insights and alerts
-    st.subheader("Key Insights")
+    # Insights section with spaced-out, attractive design
+    st.subheader("Key Insights & Analysis")
+    st.markdown("<style>.stAlert {padding: 10px; border-radius: 5px; margin-bottom: 15px;}</style>", unsafe_allow_html=True)
+
     if not filtered.empty:
-        st.write("Based on data: High AQI in cities may be driven by dominant pollutants like PM2.5 or PM10. Recommendation: Monitor sensitive groups in high-risk areas.")
+        # Data Snapshot Card
+        st.markdown("""
+        <div style='background-color: #f0f9ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px;'>
+            <h4 style='color: #0066cc; margin: 0;'>Data Snapshot</h4>
+            As of 11:14 AM AWST, Sep 09, 2025: AQI 28 (Good). Sydney: 41-43, Brisbane: 20.
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Action Plan Cards with spacing
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("""
+            <div style='background-color: #fff3e6; padding: 10px; border-radius: 5px; border-left: 5px solid #ff7043; margin-bottom: 20px;'>
+                <h5 style='color: #ff7043;'>🛡️ Protect</h5>
+                Monitor kids/elderly (AQI > 100).
+            </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            st.markdown("""
+            <div style='background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px;'>
+                <h5 style='color: #0066cc;'>⏳ Limit</h5>
+                Avoid morning peaks.
+            </div>
+            """, unsafe_allow_html=True)
+        with col3:
+            st.markdown("""
+            <div style='background-color: #e8f5e9; padding: 10px; border-radius: 5px; border-left: 5px solid #2e7d32;'>
+                <h5 style='color: #2e7d32;'>🌱 Green</h5>
+                Cut NO2 with policy.
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Health Risks Expander
+        with st.expander("🏥 Health Risks"):
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.markdown("""
+                <div style='background-color: #ffebee; padding: 8px; border-radius: 3px; margin-bottom: 10px;'>
+                    <strong>PM2.5:</strong> Lung/heart risk.
+                </div>
+                """, unsafe_allow_html=True)
+            with col_b:
+                st.markdown("""
+                <div style='background-color: #fff3e0; padding: 8px; border-radius: 3px; margin-bottom: 10px;'>
+                    <strong>NO2:</strong> Airway irritation.
+                </div>
+                """, unsafe_allow_html=True)
+            st.markdown("""
+            <div style='background-color: #e8f5e9; padding: 8px; border-radius: 3px;'>
+                <strong>O3:</strong> Breathing issues on hot days.
+            </div>
+            """, unsafe_allow_html=True)
+
+        # High-Risk Cities Table
+        high_risk = filtered[filtered["aqi"] > 100].sort_values("aqi", ascending=False)
+        if not high_risk.empty:
+            st.subheader("⚠️ High-Risk Cities")
+            st.dataframe(high_risk[["city", "aqi", "aqi_category", "dominentpol"]], 
+                        use_container_width=True, 
+                        hide_index=True,
+                        column_config={
+                            "aqi": st.column_config.NumberColumn("AQI", format="%.0f"),
+                            "aqi_category": st.column_config.TextColumn("Category", width="medium")
+                        })
+        else:
+            st.info("No cities exceed AQI 100 today.")
+
+        # Pollutant Breakdown Pie Chart
+        if "dominentpol" in filtered.columns:
+            st.subheader("Pollutant Breakdown")
+            fig_pie = px.pie(filtered, names="dominentpol", 
+                            title="Dominant Pollutants (Sep 09, 2025)", 
+                            hole=0.3, 
+                            color_discrete_sequence=px.colors.qualitative.Pastel1)
+            fig_pie.update_traces(textposition='inside', textinfo='percent+label', 
+                                marker=dict(line=dict(color='#333333', width=1.5)))
+            fig_pie.update_layout(
+                showlegend=True, 
+                legend_title="Pollutants", 
+                font=dict(size=12),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=10, r=10, t=30, b=10)
+            )
+            st.plotly_chart(fig_pie, use_container_width=True)
+
+        # Current Alerts with styled boxes
+        st.subheader("Current Alerts")
         for _, row in filtered.iterrows():
             if row["aqi"] > 150 and pd.notna(row["aqi"]):
-                st.warning(f"Alert for {row['city']}: {row['aqi_category']} (AQI: {row['aqi']})")
+                st.markdown(f"""
+                <div class='stAlert' style='background-color: #ffebee; color: #c62828; border-left: 5px solid #c62828;'>
+                    🚨 **Critical**: {row['city']} - {row['aqi_category']} (AQI: {row['aqi']})
+                </div>
+                """, unsafe_allow_html=True)
+            elif row["aqi"] > 100:
+                st.markdown(f"""
+                <div class='stAlert' style='background-color: #fff3e0; color: #ef6c00; border-left: 5px solid #ef6c00;'>
+                    ⚠️ **Caution**: {row['city']} - {row['aqi_category']} (AQI: {row['aqi']})
+                </div>
+                """, unsafe_allow_html=True)
     else:
-        st.warning("No data available for insights.")
+        st.warning("No data available for insights today. :disappointed:")
 
 # Download button
 if not filtered.empty:
@@ -318,5 +417,5 @@ st.markdown("""
 ---
 **Developed by**:   
 ICT605 Group Project Team – Semester 2, 2025.  
-**Version: 3.0.0**
+**Version: 3.0.1**
 """)
