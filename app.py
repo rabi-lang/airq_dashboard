@@ -48,30 +48,30 @@ cities = sorted(df_latest["city"].dropna().unique()) if not df_latest.empty else
 pick_cities = st.sidebar.multiselect("Cities", options=cities, default=cities[:1] if cities else [])
 pollutants = [c for c in ["pm25", "pm10", "o3", "no2", "so2", "co", "nh3"] if c in df_latest.columns]
 pick_pol = st.sidebar.selectbox("Pollutant detail", pollutants if pollutants else [None])
-if df_log is not None and not df_log.empty:
-    date_range = st.sidebar.date_input(
-        "Date Range",
-        value=(df_log["observed_at_awst"].min().date(), df_log["observed_at_awst"].max().date())
-    )
-else:
-    date_range = None
+# if df_log is not None and not df_log.empty:
+#     date_range = st.sidebar.date_input(
+#         "Date Range",
+#         value=(df_log["observed_at_awst"].min().date(), df_log["observed_at_awst"].max().date())
+#     )
+# else:
+#     date_range = None
 
 # Real-time refresh button
 if st.sidebar.button("Refresh Data"):
     try:
         os.system("python fetch_aqicn.py")
-        st.experimental_rerun()
+        st.rerun()
     except Exception as e:
         st.error(f"Refresh failed: {e}")
 
 # Filter data
 filtered = df_latest[df_latest["city"].isin(pick_cities)].copy() if not df_latest.empty else pd.DataFrame()
-if df_log is not None and not df_log.empty and date_range:
-    df_log = df_log[
-        (df_log["observed_at_awst"].dt.date >= date_range[0]) &
-        (df_log["observed_at_awst"].dt.date <= date_range[1]) &
-        (df_log["city"].isin(pick_cities))
-    ].copy()
+# if df_log is not None and not df_log.empty and date_range:
+#     df_log = df_log[
+#         (df_log["observed_at_awst"].dt.date >= date_range[0]) &
+#         (df_log["observed_at_awst"].dt.date <= date_range[1]) &
+#         (df_log["city"].isin(pick_cities))
+#     ].copy()
 
 # Tabs for storytelling (Overview, Trends & Discovery, Insights)
 tab1, tab2, tab3 = st.tabs(["Overview", "Trends & Discovery", "Insights"])
@@ -302,7 +302,7 @@ with tab3:
     if not filtered.empty:
         # Data Snapshot Card
         st.markdown("""
-        <div style='background-color: #f0f9ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px;'>
+        <div style='background-color: #f0f9ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px; color: black;'>
             <h4 style='color: #0066cc; margin: 0;'>Data Snapshot</h4>
             As of 11:14 AM AWST, Sep 09, 2025: AQI 28 (Good). Sydney: 41-43, Brisbane: 20.
         </div>
@@ -312,21 +312,21 @@ with tab3:
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("""
-            <div style='background-color: #fff3e6; padding: 10px; border-radius: 5px; border-left: 5px solid #ff7043; margin-bottom: 20px;'>
+            <div style='background-color: #fff3e6; padding: 10px; border-radius: 5px; border-left: 5px solid #ff7043; margin-bottom: 20px; color: black;'>
                 <h5 style='color: #ff7043;'>🛡️ Protect</h5>
                 Monitor kids/elderly (AQI > 100).
             </div>
             """, unsafe_allow_html=True)
         with col2:
             st.markdown("""
-            <div style='background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px;'>
+            <div style='background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 5px solid #0066cc; margin-bottom: 20px; color: black;'>
                 <h5 style='color: #0066cc;'>⏳ Limit</h5>
                 Avoid morning peaks.
             </div>
             """, unsafe_allow_html=True)
         with col3:
             st.markdown("""
-            <div style='background-color: #e8f5e9; padding: 10px; border-radius: 5px; border-left: 5px solid #2e7d32;'>
+            <div style='background-color: #e8f5e9; padding: 10px; border-radius: 5px; border-left: 5px solid #2e7d32; color: black;'>
                 <h5 style='color: #2e7d32;'>🌱 Green</h5>
                 Cut NO2 with policy.
             </div>
@@ -337,18 +337,18 @@ with tab3:
             col_a, col_b = st.columns(2)
             with col_a:
                 st.markdown("""
-                <div style='background-color: #ffebee; padding: 8px; border-radius: 3px; margin-bottom: 10px;'>
+                <div style='background-color: #ffebee; padding: 8px; border-radius: 3px; margin-bottom: 10px; color: black;'>
                     <strong>PM2.5:</strong> Lung/heart risk.
                 </div>
                 """, unsafe_allow_html=True)
             with col_b:
                 st.markdown("""
-                <div style='background-color: #fff3e0; padding: 8px; border-radius: 3px; margin-bottom: 10px;'>
+                <div style='background-color: #fff3e0; padding: 8px; border-radius: 3px; margin-bottom: 10px; color: black;'>
                     <strong>NO2:</strong> Airway irritation.
                 </div>
                 """, unsafe_allow_html=True)
             st.markdown("""
-            <div style='background-color: #e8f5e9; padding: 8px; border-radius: 3px;'>
+            <div style='background-color: #e8f5e9; padding: 8px; border-radius: 3px; color: black;'>
                 <strong>O3:</strong> Breathing issues on hot days.
             </div>
             """, unsafe_allow_html=True)
